@@ -21,6 +21,7 @@ class Admin extends React.Component {
       sidebarOpened: document.documentElement.className.indexOf("nav-open") !== -1
     };
   }
+
   componentDidMount() {
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
@@ -32,6 +33,7 @@ class Admin extends React.Component {
       }
     }
   }
+
   componentWillUnmount() {
     if (navigator.platform.indexOf("Win") > -1) {
       ps.destroy();
@@ -39,6 +41,7 @@ class Admin extends React.Component {
       document.documentElement.classList.remove("perfect-scrollbar-on");
     }
   }
+
   componentDidUpdate(e) {
     if (e.history.action === "PUSH") {
       if (navigator.platform.indexOf("Win") > -1) {
@@ -52,26 +55,29 @@ class Admin extends React.Component {
       this.refs.mainPanel.scrollTop = 0;
     }
   }
-  // this function opens and closes the sidebar on small devices
+
   toggleSidebar = () => {
     document.documentElement.classList.toggle("nav-open");
     this.setState({ sidebarOpened: !this.state.sidebarOpened });
   };
+
   getRoutes = routes => {
+    const type = window.localStorage.getItem("type");
     return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-        return <Route path={prop.layout + prop.path} component={prop.component} key={key} />;
-      } else {
-        return null;
+      if (prop.layout === "both" || type === prop.layout) {
+        return <Route path={prop.path} component={prop.component} key={key} />;
       }
+      return null;
     });
   };
+
   handleBgClick = color => {
     this.setState({ backgroundColor: color });
   };
+
   getBrandText = path => {
     for (let i = 0; i < routes.length; i++) {
-      if (this.props.location.pathname.indexOf(routes[i].layout + routes[i].path) !== -1) {
+      if (this.props.location.pathname === routes[i].path) {
         return routes[i].name;
       }
     }
@@ -85,7 +91,7 @@ class Admin extends React.Component {
           routes={routes}
           bgColor={this.state.backgroundColor}
           logo={{
-            outterLink: "https://www.creative-tim.com/",
+            outterLink: "/",
             text: "Creative Tim",
             imgSrc: logo
           }}

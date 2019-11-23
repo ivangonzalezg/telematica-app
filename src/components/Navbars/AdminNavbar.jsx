@@ -1,26 +1,25 @@
 import React from "react";
-// nodejs library that concatenates classes
 import classNames from "classnames";
-
-// reactstrap components
-import { Input, NavbarBrand, Navbar, Container, Modal } from "reactstrap";
+import { Collapse, DropdownToggle, DropdownMenu, UncontrolledDropdown, Input, NavbarBrand, Navbar, NavLink, Nav, Container, Form, Button } from "reactstrap";
+import API from "../../API";
 
 class AdminNavbar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       collapseOpen: false,
-      modalSearch: false,
-      color: "navbar-transparent"
+      color: "navbar-transparent",
+      identification: 0
     };
   }
   componentDidMount() {
     window.addEventListener("resize", this.updateColor);
   }
+
   componentWillUnmount() {
     window.removeEventListener("resize", this.updateColor);
   }
-  // function that adds color white/transparent to the navbar on resize (this is for the collapse)
+
   updateColor = () => {
     if (window.innerWidth < 993 && this.state.collapseOpen) {
       this.setState({
@@ -32,7 +31,7 @@ class AdminNavbar extends React.Component {
       });
     }
   };
-  // this function opens and closes the collapse on small devices
+
   toggleCollapse = () => {
     if (this.state.collapseOpen) {
       this.setState({
@@ -47,13 +46,25 @@ class AdminNavbar extends React.Component {
       collapseOpen: !this.state.collapseOpen
     });
   };
-  // this function is to open the Search modal
-  toggleModalSearch = () => {
-    this.setState({
-      modalSearch: !this.state.modalSearch
-    });
+
+  login = async () => {
+    const { identification } = this.state;
+    if (identification === 0) {
+      window.localStorage.setItem("type", "admin");
+      window.location.reload();
+      return;
+    }
+    const r = await API.voter.get("identification=" + identification);
+    if (r.data.length) {
+      window.localStorage.setItem("user", JSON.stringify(r.data[0]));
+      window.localStorage.setItem("type", "voter");
+      window.location.reload();
+    }
   };
+
   render() {
+    const type = window.localStorage.getItem("type");
+    const user = JSON.parse(window.localStorage.getItem("user"));
     return (
       <>
         <Navbar className={classNames("navbar-absolute", this.state.color)} expand="lg">
@@ -70,20 +81,74 @@ class AdminNavbar extends React.Component {
                   <span className="navbar-toggler-bar bar3" />
                 </button>
               </div>
-              <NavbarBrand href="#pablo" onClick={e => e.preventDefault()}>
+              <NavbarBrand href="/" onClick={e => e.preventDefault()}>
                 {this.props.brandText}
               </NavbarBrand>
             </div>
+            <button
+              aria-expanded={false}
+              aria-label="Toggle navigation"
+              className="navbar-toggler"
+              data-target="#navigation"
+              data-toggle="collapse"
+              id="navigation"
+              type="button"
+              onClick={this.toggleCollapse}
+            >
+              <span className="navbar-toggler-bar navbar-kebab" />
+              <span className="navbar-toggler-bar navbar-kebab" />
+              <span className="navbar-toggler-bar navbar-kebab" />
+            </button>
+            <Collapse navbar isOpen={this.state.collapseOpen}>
+              <Nav className="ml-auto" navbar>
+                <UncontrolledDropdown nav>
+                  <DropdownToggle caret color="default" data-toggle="dropdown" nav onClick={e => e.preventDefault()}>
+                    <div className="photo">
+                      <img alt="..." src={require("assets/img/anime3.png")} />
+                    </div>
+                    <b className="caret d-none d-lg-block d-xl-block" />
+                    <p className="d-lg-none">Log out</p>
+                  </DropdownToggle>
+                  <DropdownMenu className="dropdown-navbar" right tag="ul">
+                    <NavLink tag="li">
+                      {type ? (
+                        <>
+                          <h2 style={{ textAlign: "center", color: "black", marginBottom: 0 }}>{user ? user.name : "Admin"}</h2>
+                          <Button
+                            color="link"
+                            onClick={() => {
+                              window.localStorage.removeItem("user");
+                              window.localStorage.removeItem("type");
+                              window.location.reload();
+                            }}
+                          >
+                            Cerrar sesión
+                          </Button>
+                        </>
+                      ) : (
+                        <Form
+                          onSubmit={e => {
+                            e.preventDefault();
+                            this.login();
+                          }}
+                        >
+                          <Input
+                            style={{ color: "black" }}
+                            placeholder="SEARCH"
+                            type="number"
+                            value={this.state.identification}
+                            onChange={e => this.setState({ identification: e.target.value })}
+                          />
+                        </Form>
+                      )}
+                    </NavLink>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+                <li className="separator d-lg-none" />
+              </Nav>
+            </Collapse>
           </Container>
         </Navbar>
-        <Modal modalClassName="modal-search" isOpen={this.state.modalSearch} toggle={this.toggleModalSearch}>
-          <div className="modal-header">
-            <Input id="inlineFormInputGroup" placeholder="SEARCH" type="text" />
-            <button aria-label="Close" className="close" data-dismiss="modal" type="button" onClick={this.toggleModalSearch}>
-              <i className="tim-icons icon-simple-remove" />
-            </button>
-          </div>
-        </Modal>
       </>
     );
   }

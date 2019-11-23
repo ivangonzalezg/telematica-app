@@ -19,7 +19,7 @@ class Sidebar extends React.Component {
   }
   // verifies if routeName is the one active (in browser input)
   activeRoute(routeName) {
-    return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
+    return this.props.location.pathname === routeName ? "active" : "";
   }
   componentDidMount() {
     if (navigator.platform.indexOf("Win") > -1) {
@@ -44,45 +44,27 @@ class Sidebar extends React.Component {
     if (logo !== undefined) {
       if (logo.outterLink !== undefined) {
         logoImg = (
-          <a
-            href={logo.outterLink}
-            className="simple-text logo-mini"
-            target="_blank"
-            onClick={this.props.toggleSidebar}
-          >
+          <a href={logo.outterLink} className="simple-text logo-mini" target="_blank" onClick={this.props.toggleSidebar}>
             <div className="logo-img">
               <img src={logo.imgSrc} alt="react-logo" />
             </div>
           </a>
         );
         logoText = (
-          <a
-            href={logo.outterLink}
-            className="simple-text logo-normal"
-            target="_blank"
-            onClick={this.props.toggleSidebar}
-          >
+          <a href={logo.outterLink} className="simple-text logo-normal" target="_blank" onClick={this.props.toggleSidebar}>
             {logo.text}
           </a>
         );
       } else {
         logoImg = (
-          <Link
-            to={logo.innerLink}
-            className="simple-text logo-mini"
-            onClick={this.props.toggleSidebar}
-          >
+          <Link to={logo.innerLink} className="simple-text logo-mini" onClick={this.props.toggleSidebar}>
             <div className="logo-img">
               <img src={logo.imgSrc} alt="react-logo" />
             </div>
           </Link>
         );
         logoText = (
-          <Link
-            to={logo.innerLink}
-            className="simple-text logo-normal"
-            onClick={this.props.toggleSidebar}
-          >
+          <Link to={logo.innerLink} className="simple-text logo-normal" onClick={this.props.toggleSidebar}>
             {logo.text}
           </Link>
         );
@@ -94,25 +76,18 @@ class Sidebar extends React.Component {
           <Nav>
             {routes.map((prop, key) => {
               if (prop.redirect) return null;
-              return (
-                <li
-                  className={
-                    this.activeRoute(prop.path) +
-                    (prop.pro ? " active-pro" : "")
-                  }
-                  key={key}
-                >
-                  <NavLink
-                    to={prop.layout + prop.path}
-                    className="nav-link"
-                    activeClassName="active"
-                    onClick={this.props.toggleSidebar}
-                  >
-                    <i className={prop.icon} />
-                    <p>{rtlActive ? prop.rtlName : prop.name}</p>
-                  </NavLink>
-                </li>
-              );
+              const type = window.localStorage.getItem("type");
+              if (prop.layout === "both" || type === prop.layout) {
+                return (
+                  <li className={this.activeRoute(prop.path) + (prop.pro ? " active-pro" : "")} key={key}>
+                    <NavLink to={prop.path} className="nav-link" activeClassName="active" onClick={this.props.toggleSidebar}>
+                      <i className={prop.icon} />
+                      <p>{rtlActive ? prop.rtlName : prop.name}</p>
+                    </NavLink>
+                  </li>
+                );
+              }
+              return null;
             })}
           </Nav>
         </div>
