@@ -1,13 +1,13 @@
 import Dashboard from "views/Dashboard.jsx";
-import Icons from "views/Icons.jsx";
-import Map from "views/Map.jsx";
-import Notifications from "views/Notifications.jsx";
+import AddCandidate from "views/AddCandidate.jsx";
+import AddPlace from "views/AddPlace.jsx";
+import AddParty from "views/AddParty.jsx";
 import TableList from "views/TableList.jsx";
-import UserProfile from "views/UserProfile.jsx";
+import UserProfile from "views/AddCharge.jsx";
 
 var routes = [
   {
-    path: "/",
+    path: "/results",
     name: "Resultados",
     icon: "tim-icons icon-chart-pie-36",
     component: Dashboard,
@@ -17,14 +17,14 @@ var routes = [
     path: "/add-location",
     name: "Añadir lugar de votación",
     icon: "tim-icons icon-square-pin",
-    component: Map,
+    component: AddPlace,
     layout: "admin"
   },
   {
     path: "/add-party",
     name: "Añadir partido",
     icon: "tim-icons icon-bullet-list-67",
-    component: Notifications,
+    component: AddParty,
     layout: "admin"
   },
   {
@@ -38,7 +38,7 @@ var routes = [
     path: "/add-candidate",
     name: "Añadir Candidato",
     icon: "tim-icons icon-single-02",
-    component: Icons,
+    component: AddCandidate,
     layout: "admin"
   },
   {

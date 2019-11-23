@@ -5,30 +5,117 @@ axios.defaults.baseURL = baseURL;
 
 const GET = "GET";
 const POST = "POST";
+const PATCH = "PATCH";
+const DELETE = "DELETE";
 
 export default {
-  voter: {
-    get: async params => {
-      const url = "/voter?" + params;
+  charge: {
+    get: async () => {
+      const url = "/charge";
       const r = await axios({
         url,
         method: GET
       });
       return r.data;
-    }
-  },
-  buses: {
-    post: async (title, id, latitude, longitude) => {
-      const url = "/buses";
+    },
+    post: async name => {
+      const url = "/charge";
       const r = await axios({
         url,
         method: POST,
-        data: {
-          title,
-          id,
-          latitude,
-          longitude
-        }
+        data: { name }
+      });
+      return r.data;
+    },
+    patch: async (id, name) => {
+      const url = "/charge";
+      const r = await axios({
+        url,
+        method: PATCH,
+        data: { id, name }
+      });
+      return r.data;
+    },
+    delete: async id => {
+      const url = "/charge";
+      const r = await axios({
+        url,
+        method: DELETE,
+        data: { id }
+      });
+      return r.data;
+    }
+  },
+  place: {
+    get: async () => {
+      const url = "/place";
+      const r = await axios({
+        url,
+        method: GET
+      });
+      return r.data;
+    },
+    post: async (name, address, city) => {
+      const url = "/place";
+      const r = await axios({
+        url,
+        method: POST,
+        data: { name, address, city }
+      });
+      return r.data;
+    },
+    patch: async (id, name, address, city) => {
+      const url = "/place";
+      const r = await axios({
+        url,
+        method: PATCH,
+        data: { id, name, address, city }
+      });
+      return r.data;
+    },
+    delete: async id => {
+      const url = "/place";
+      const r = await axios({
+        url,
+        method: DELETE,
+        data: { id }
+      });
+      return r.data;
+    }
+  },
+  party: {
+    get: async () => {
+      const url = "/party";
+      const r = await axios({
+        url,
+        method: GET
+      });
+      return r.data;
+    },
+    post: async name => {
+      const url = "/party";
+      const r = await axios({
+        url,
+        method: POST,
+        data: { name }
+      });
+      return r.data;
+    },
+    patch: async (id, name) => {
+      const url = "/party";
+      const r = await axios({
+        url,
+        method: PATCH,
+        data: { id, name }
+      });
+      return r.data;
+    },
+    delete: async id => {
+      const url = "/party";
+      const r = await axios({
+        url,
+        method: DELETE,
+        data: { id }
       });
       return r.data;
     }
