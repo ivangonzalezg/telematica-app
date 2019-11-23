@@ -77,7 +77,7 @@ class Admin extends React.Component {
 
   getBrandText = path => {
     for (let i = 0; i < routes.length; i++) {
-      if (this.props.location.pathname === routes[i].path) {
+      if (path === routes[i].path) {
         return routes[i].name;
       }
     }
