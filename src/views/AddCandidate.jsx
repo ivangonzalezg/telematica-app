@@ -130,12 +130,12 @@ class UserProfile extends React.Component {
                             <td>{c.charge.name}</td>
                             <td>{c.party.name}</td>
                             <td>
-                              <a href={`${APIURL}/photo/${c._id}.png`} target="_blank">
+                              <a href={`${APIURL}/photo/${c._id}.png`} target="_blank" rel="noopener noreferrer">
                                 Click aquí
                               </a>
                             </td>
                             <td>
-                              <a href={`${APIURL}/plan/${c._id}.pdf`} target="_blank">
+                              <a href={`${APIURL}/plan/${c._id}.pdf`} target="_blank" rel="noopener noreferrer">
                                 Click aquí
                               </a>
                             </td>
