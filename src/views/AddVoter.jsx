@@ -126,7 +126,7 @@ class UserProfile extends React.Component {
                                 onClick={async () => {
                                   try {
                                     // eslint-disable-next-line no-restricted-globals
-                                    const isDelete = confirm(`¿Seguro que quierer borrar el votante de ${c.name}?`);
+                                    const isDelete = confirm(`¿Seguro que quierer borrar el votante ${c.name}?`);
                                     if (isDelete) {
                                       await API.voter.delete(c._id);
                                       window.location.reload();
