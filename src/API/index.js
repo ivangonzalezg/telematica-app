@@ -157,5 +157,42 @@ export default {
       });
       return r.data;
     }
+  },
+  voter: {
+    get: async () => {
+      const url = "/voter";
+      const r = await axios({
+        url,
+        method: GET
+      });
+      return r.data;
+    },
+    post: async (name, identification, city, place) => {
+      const url = "/voter";
+      const r = await axios({
+        url,
+        method: POST,
+        data: { name, identification, city, place }
+      });
+      return r.data;
+    },
+    patch: async (id, name, identification, city, place) => {
+      const url = "/voter";
+      const r = await axios({
+        url,
+        method: PATCH,
+        data: { id, name, identification, city, place }
+      });
+      return r.data;
+    },
+    delete: async id => {
+      const url = "/voter";
+      const r = await axios({
+        url,
+        method: DELETE,
+        data: { id }
+      });
+      return r.data;
+    }
   }
 };
