@@ -69,7 +69,6 @@ class UserProfile extends React.Component {
                   <Table className="tablesorter" responsive>
                     <thead className="text-primary">
                       <tr>
-                        <th>Id</th>
                         <th>Nombre</th>
                         <th>Creado</th>
                         <th>Actualizado</th>
@@ -80,7 +79,6 @@ class UserProfile extends React.Component {
                       {this.state.parties.map((c, i) => {
                         return (
                           <tr key={i}>
-                            <td>{c._id}</td>
                             <td>{c.name}</td>
                             <td>{new Date(c.createdAt).toLocaleString()}</td>
                             <td>{new Date(c.updatedAt).toLocaleString()}</td>
@@ -135,10 +133,17 @@ class UserProfile extends React.Component {
                     }}
                   >
                     <Row>
-                      <Col className="" md="6">
+                      <Col md="6">
                         <FormGroup>
-                          <label>Nombre</label>
-                          <Input required placeholder="Nombre" type="text" value={this.state.name} onChange={e => this.setState({ name: e.target.value })} />
+                          <label htmlFor="name">Nombre</label>
+                          <Input
+                            required
+                            placeholder="Nombre"
+                            id="name"
+                            type="text"
+                            value={this.state.name}
+                            onChange={e => this.setState({ name: e.target.value })}
+                          />
                         </FormGroup>
                       </Col>
                     </Row>

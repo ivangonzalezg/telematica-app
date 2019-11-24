@@ -73,7 +73,6 @@ class UserProfile extends React.Component {
                   <Table className="tablesorter" responsive>
                     <thead className="text-primary">
                       <tr>
-                        <th>Id</th>
                         <th>Nombre</th>
                         <th>Dirección</th>
                         <th>Ciudad</th>
@@ -86,7 +85,6 @@ class UserProfile extends React.Component {
                       {this.state.places.map((c, i) => {
                         return (
                           <tr key={i}>
-                            <td>{c._id}</td>
                             <td>{c.name}</td>
                             <td>{c.address}</td>
                             <td>{c.city}</td>
@@ -143,24 +141,26 @@ class UserProfile extends React.Component {
                     }}
                   >
                     <Row>
-                      <Col className="" md="6">
+                      <Col md="6">
                         <FormGroup>
-                          <label>Nombre</label>
+                          <label htmlFor="name">Nombre</label>
                           <Input
-                            required={!this.state.isEditing}
+                            required
                             placeholder="Nombre"
+                            id="name"
                             type="text"
                             value={this.state.name}
                             onChange={e => this.setState({ name: e.target.value })}
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="" md="6">
+                      <Col md="6">
                         <FormGroup>
-                          <label>Dirección</label>
+                          <label htmlFor="address">Dirección</label>
                           <Input
-                            required={!this.state.isEditing}
+                            required
                             placeholder="Dirección"
+                            id="address"
                             type="text"
                             value={this.state.address}
                             onChange={e => this.setState({ address: e.target.value })}
@@ -169,12 +169,13 @@ class UserProfile extends React.Component {
                       </Col>
                     </Row>
                     <Row>
-                      <Col className="" md="6">
+                      <Col md="6">
                         <FormGroup>
-                          <label>Ciudad</label>
+                          <label htmlFor="city">Ciudad</label>
                           <Input
-                            required={!this.state.isEditing}
+                            required
                             placeholder="Ciudad"
+                            id="city"
                             type="text"
                             value={this.state.city}
                             onChange={e => this.setState({ city: e.target.value })}

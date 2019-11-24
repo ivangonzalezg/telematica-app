@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseURL = `http://localhost:5000/api`;
+const { hostname, protocol } = window.location;
+const baseURL = `${protocol}//${hostname}:5000/api`;
 axios.defaults.baseURL = baseURL;
 
 const GET = "GET";
@@ -112,6 +113,43 @@ export default {
     },
     delete: async id => {
       const url = "/party";
+      const r = await axios({
+        url,
+        method: DELETE,
+        data: { id }
+      });
+      return r.data;
+    }
+  },
+  candidate: {
+    get: async () => {
+      const url = "/candidate";
+      const r = await axios({
+        url,
+        method: GET
+      });
+      return r.data;
+    },
+    post: async (name, identification, charge, party, photo, plan, resume) => {
+      const url = "/candidate";
+      const r = await axios({
+        url,
+        method: POST,
+        data: { name, identification, charge, party, photo, plan, resume }
+      });
+      return r.data;
+    },
+    patch: async (id, name, identification, charge, party, photo, plan, resume) => {
+      const url = "/candidate";
+      const r = await axios({
+        url,
+        method: PATCH,
+        data: { id, name, identification, charge, party, photo, plan, resume }
+      });
+      return r.data;
+    },
+    delete: async id => {
+      const url = "/candidate";
       const r = await axios({
         url,
         method: DELETE,

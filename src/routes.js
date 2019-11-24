@@ -3,6 +3,7 @@ import AddCandidate from "views/AddCandidate.jsx";
 import AddPlace from "views/AddPlace.jsx";
 import AddParty from "views/AddParty.jsx";
 import TableList from "views/TableList.jsx";
+import AddVoter from "views/AddVoter.jsx";
 import UserProfile from "views/AddCharge.jsx";
 
 var routes = [
@@ -45,7 +46,7 @@ var routes = [
     path: "/add-voter",
     name: "Añadir votante",
     icon: "tim-icons icon-simple-add",
-    component: TableList,
+    component: AddVoter,
     layout: "admin"
   },
   {
