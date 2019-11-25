@@ -1,7 +1,6 @@
 import React from "react";
 import classNames from "classnames";
 import { Collapse, DropdownToggle, DropdownMenu, UncontrolledDropdown, Input, NavbarBrand, Navbar, NavLink, Nav, Container, Form, Button } from "reactstrap";
-import API from "../../API";
 
 class AdminNavbar extends React.Component {
   constructor(props) {
@@ -9,7 +8,7 @@ class AdminNavbar extends React.Component {
     this.state = {
       collapseOpen: false,
       color: "navbar-transparent",
-      identification: 0
+      identification: ""
     };
   }
   componentDidMount() {
@@ -49,22 +48,13 @@ class AdminNavbar extends React.Component {
 
   login = async () => {
     const { identification } = this.state;
-    if (identification === 0) {
-      window.localStorage.setItem("type", "admin");
-      window.location.reload();
-      return;
-    }
-    const r = await API.voter.get("identification=" + identification);
-    if (r.data.length) {
-      window.localStorage.setItem("user", JSON.stringify(r.data[0]));
-      window.localStorage.setItem("type", "voter");
-      window.location.reload();
-    }
+    window.localStorage.setItem("type", identification);
+    window.location.reload();
+    return;
   };
 
   render() {
     const type = window.localStorage.getItem("type");
-    const user = JSON.parse(window.localStorage.getItem("user"));
     return (
       <>
         <Navbar className={classNames("navbar-absolute", this.state.color)} expand="lg">
@@ -113,7 +103,7 @@ class AdminNavbar extends React.Component {
                     <NavLink tag="li">
                       {type ? (
                         <>
-                          <h2 style={{ textAlign: "center", color: "black", marginBottom: 0 }}>{user ? user.name : "Admin"}</h2>
+                          <h2 style={{ textAlign: "center", color: "black", marginBottom: 0 }}>{type}</h2>
                           <Button
                             color="link"
                             onClick={() => {
@@ -134,8 +124,8 @@ class AdminNavbar extends React.Component {
                         >
                           <Input
                             style={{ color: "black" }}
-                            placeholder="SEARCH"
-                            type="number"
+                            placeholder="contraseña"
+                            type="text"
                             value={this.state.identification}
                             onChange={e => this.setState({ identification: e.target.value })}
                           />

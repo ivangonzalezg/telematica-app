@@ -1,14 +1,10 @@
 /*eslint-disable*/
 import React from "react";
 import { NavLink, Link } from "react-router-dom";
-// nodejs library to set properties for components
 import { PropTypes } from "prop-types";
-
-// javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
-
-// reactstrap components
 import { Nav } from "reactstrap";
+import shortid from "shortid";
 
 var ps;
 
@@ -17,10 +13,11 @@ class Sidebar extends React.Component {
     super(props);
     this.activeRoute.bind(this);
   }
-  // verifies if routeName is the one active (in browser input)
+
   activeRoute(routeName) {
     return this.props.location.pathname === routeName ? "active" : "";
   }
+
   componentDidMount() {
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(this.refs.sidebar, {
@@ -29,14 +26,17 @@ class Sidebar extends React.Component {
       });
     }
   }
+
   componentWillUnmount() {
     if (navigator.platform.indexOf("Win") > -1) {
       ps.destroy();
     }
   }
+
   linkOnClick = () => {
     document.documentElement.classList.remove("nav-open");
   };
+
   render() {
     const { bgColor, routes, rtlActive, logo } = this.props;
     let logoImg = null;
@@ -74,12 +74,12 @@ class Sidebar extends React.Component {
       <div className="sidebar" data={bgColor}>
         <div className="sidebar-wrapper" ref="sidebar">
           <Nav>
-            {routes.map((prop, key) => {
+            {routes.map(prop => {
               if (prop.redirect) return null;
               const type = window.localStorage.getItem("type");
               if (prop.layout === "both" || type === prop.layout) {
                 return (
-                  <li className={this.activeRoute(prop.path) + (prop.pro ? " active-pro" : "")} key={key}>
+                  <li className={this.activeRoute(prop.path) + (prop.pro ? " active-pro" : "")} key={shortid.generate()}>
                     <NavLink to={prop.path} className="nav-link" activeClassName="active" onClick={this.props.toggleSidebar}>
                       <i className={prop.icon} />
                       <p>{rtlActive ? prop.rtlName : prop.name}</p>
@@ -103,21 +103,13 @@ Sidebar.defaultProps = {
 };
 
 Sidebar.propTypes = {
-  // if true, then instead of the routes[i].name, routes[i].rtlName will be rendered
-  // insde the links of this component
   rtlActive: PropTypes.bool,
   bgColor: PropTypes.oneOf(["primary", "blue", "green"]),
   routes: PropTypes.arrayOf(PropTypes.object),
   logo: PropTypes.shape({
-    // innerLink is for links that will direct the user within the app
-    // it will be rendered as <Link to="...">...</Link> tag
     innerLink: PropTypes.string,
-    // outterLink is for links that will direct the user outside the app
-    // it will be rendered as simple <a href="...">...</a> tag
     outterLink: PropTypes.string,
-    // the text of the logo
     text: PropTypes.node,
-    // the image src of the logo
     imgSrc: PropTypes.string
   })
 };

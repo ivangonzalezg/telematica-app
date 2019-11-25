@@ -1,8 +1,9 @@
 import React from "react";
 import { Button, Card, CardHeader, CardBody, CardFooter, CardTitle, Table, FormGroup, Input, Row, Col, Form } from "reactstrap";
 import API from "../API";
+import shortid from "shortid";
 
-class UserProfile extends React.Component {
+class AddParty extends React.Component {
   constructor(props) {
     super(props);
 
@@ -16,6 +17,7 @@ class UserProfile extends React.Component {
         }
       ],
       isEditing: false,
+      isData: false,
       name: "",
       id: ""
     };
@@ -23,7 +25,7 @@ class UserProfile extends React.Component {
 
   async componentDidMount() {
     const r = await API.party.get();
-    this.setState({ parties: r.data });
+    this.setState({ parties: r.data, isData: true });
   }
 
   onClick = async () => {
@@ -76,46 +78,47 @@ class UserProfile extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {this.state.parties.map((c, i) => {
-                        return (
-                          <tr key={i}>
-                            <td>{c.name}</td>
-                            <td>{new Date(c.createdAt).toLocaleString()}</td>
-                            <td>{new Date(c.updatedAt).toLocaleString()}</td>
-                            <td>
-                              <Button
-                                className="btn-round"
-                                size="sm"
-                                color="info"
-                                onClick={() => {
-                                  this.setState({ isEditing: true, id: c._id, name: c.name });
-                                }}
-                              >
-                                Editar
-                              </Button>
-                              <Button
-                                className="btn-round"
-                                size="sm"
-                                color="danger"
-                                onClick={async () => {
-                                  try {
-                                    // eslint-disable-next-line no-restricted-globals
-                                    const isDelete = confirm(`¿Seguro que quierer borrar el cargo de ${c.name}?`);
-                                    if (isDelete) {
-                                      await API.party.delete(c._id);
-                                      window.location.reload();
+                      {this.state.isData &&
+                        this.state.parties.map(c => {
+                          return (
+                            <tr key={shortid.generate()}>
+                              <td>{c.name}</td>
+                              <td>{new Date(c.createdAt).toLocaleString()}</td>
+                              <td>{new Date(c.updatedAt).toLocaleString()}</td>
+                              <td style={{ justifyContent: "space-around", display: "flex" }}>
+                                <Button
+                                  className="btn-round"
+                                  size="sm"
+                                  color="info"
+                                  onClick={() => {
+                                    this.setState({ isEditing: true, id: c._id, name: c.name });
+                                  }}
+                                >
+                                  Editar
+                                </Button>
+                                <Button
+                                  className="btn-round"
+                                  size="sm"
+                                  color="danger"
+                                  onClick={async () => {
+                                    try {
+                                      // eslint-disable-next-line no-restricted-globals
+                                      const isDelete = confirm(`¿Seguro que quierer borrar el cargo de ${c.name}?`);
+                                      if (isDelete) {
+                                        await API.party.delete(c._id);
+                                        window.location.reload();
+                                      }
+                                    } catch (error) {
+                                      alert(error);
                                     }
-                                  } catch (error) {
-                                    alert(error);
-                                  }
-                                }}
-                              >
-                                Eliminar
-                              </Button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                  }}
+                                >
+                                  Eliminar
+                                </Button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </Table>
                 </CardBody>
@@ -163,4 +166,4 @@ class UserProfile extends React.Component {
   }
 }
 
-export default UserProfile;
+export default AddParty;

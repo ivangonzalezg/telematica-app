@@ -2,9 +2,10 @@ import Dashboard from "views/Dashboard.jsx";
 import AddCandidate from "views/AddCandidate.jsx";
 import AddPlace from "views/AddPlace.jsx";
 import AddParty from "views/AddParty.jsx";
-import TableList from "views/TableList.jsx";
+import Vote from "views/Vote.jsx";
 import AddVoter from "views/AddVoter.jsx";
-import UserProfile from "views/AddCharge.jsx";
+import AddCharge from "views/AddCharge.jsx";
+import ChoosePlace from "views/ChoosePlace";
 
 var routes = [
   {
@@ -32,8 +33,8 @@ var routes = [
     path: "/add-charge",
     name: "Añadir cargos",
     icon: "tim-icons icon-bank",
-    component: UserProfile,
-    layout: "admin"
+    component: AddCharge,
+    layout: "superadmin"
   },
   {
     path: "/add-candidate",
@@ -50,11 +51,18 @@ var routes = [
     layout: "admin"
   },
   {
+    path: "/choose-location",
+    name: "Elegir lugar de votación",
+    icon: "tim-icons icon-square-pin",
+    component: ChoosePlace,
+    layout: "both"
+  },
+  {
     path: "/vote",
     name: "Votar",
     icon: "tim-icons icon-book-bookmark",
-    component: TableList,
-    layout: "voter"
+    component: Vote,
+    layout: "both"
   }
 ];
 export default routes;

@@ -1,8 +1,10 @@
 import React from "react";
 import { Button, Card, CardHeader, CardBody, CardFooter, CardTitle, Table, FormGroup, Input, Row, Col, Form } from "reactstrap";
 import API from "../API";
+import cities from "../API/Cities";
+import shortid from "shortid";
 
-class UserProfile extends React.Component {
+class AddPlace extends React.Component {
   constructor(props) {
     super(props);
 
@@ -13,30 +15,34 @@ class UserProfile extends React.Component {
           name: "",
           address: "",
           city: "",
+          state: "",
           createdAt: "",
           updatedAt: ""
         }
       ],
       isEditing: false,
+      isData: false,
       name: "",
       id: "",
       address: "",
-      city: ""
+      city: "",
+      cityState: "",
+      state: ""
     };
   }
 
   async componentDidMount() {
     const r = await API.place.get();
-    this.setState({ places: r.data });
+    this.setState({ places: r.data, isData: true });
   }
 
   onClick = async () => {
-    const { name, address, city, isEditing, id } = this.state;
+    const { name, address, city, isEditing, id, state } = this.state;
     try {
       if (isEditing) {
-        await API.place.patch(id, name, address, city);
+        await API.place.patch(id, name, address, city, state);
       } else {
-        await API.place.post(name, address, city);
+        await API.place.post(name, address, city, state);
       }
       window.location.reload();
     } catch (error) {
@@ -82,48 +88,56 @@ class UserProfile extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {this.state.places.map((c, i) => {
-                        return (
-                          <tr key={i}>
-                            <td>{c.name}</td>
-                            <td>{c.address}</td>
-                            <td>{c.city}</td>
-                            <td>{new Date(c.createdAt).toLocaleString()}</td>
-                            <td>{new Date(c.updatedAt).toLocaleString()}</td>
-                            <td>
-                              <Button
-                                className="btn-round"
-                                size="sm"
-                                color="info"
-                                onClick={() => {
-                                  this.setState({ isEditing: true, id: c._id, name: c.name, address: c.address, city: c.city });
-                                }}
-                              >
-                                Editar
-                              </Button>
-                              <Button
-                                className="btn-round"
-                                size="sm"
-                                color="danger"
-                                onClick={async () => {
-                                  try {
-                                    // eslint-disable-next-line no-restricted-globals
-                                    const isDelete = confirm(`¿Seguro que quierer borrar el lugar de votación ${c.name}?`);
-                                    if (isDelete) {
-                                      await API.place.delete(c._id);
-                                      window.location.reload();
+                      {this.state.isData &&
+                        this.state.places.map(c => {
+                          return (
+                            <tr key={shortid.generate()}>
+                              <td>{c.name}</td>
+                              <td>{c.address}</td>
+                              <td>{c.city}</td>
+                              <td>{new Date(c.createdAt).toLocaleString()}</td>
+                              <td>{new Date(c.updatedAt).toLocaleString()}</td>
+                              <td style={{ justifyContent: "space-around", display: "flex" }}>
+                                <Button
+                                  className="btn-round"
+                                  size="sm"
+                                  color="info"
+                                  onClick={() => {
+                                    this.setState({
+                                      isEditing: true,
+                                      id: c._id,
+                                      name: c.name,
+                                      address: c.address,
+                                      city: c.city,
+                                      cityState: `${c.city}##${c.state}`
+                                    });
+                                  }}
+                                >
+                                  Editar
+                                </Button>
+                                <Button
+                                  className="btn-round"
+                                  size="sm"
+                                  color="danger"
+                                  onClick={async () => {
+                                    try {
+                                      // eslint-disable-next-line no-restricted-globals
+                                      const isDelete = confirm(`¿Seguro que quierer borrar el lugar de votación ${c.name}?`);
+                                      if (isDelete) {
+                                        await API.place.delete(c._id);
+                                        window.location.reload();
+                                      }
+                                    } catch (error) {
+                                      alert(error);
                                     }
-                                  } catch (error) {
-                                    alert(error);
-                                  }
-                                }}
-                              >
-                                Eliminar
-                              </Button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                  }}
+                                >
+                                  Eliminar
+                                </Button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </Table>
                 </CardBody>
@@ -173,13 +187,27 @@ class UserProfile extends React.Component {
                         <FormGroup>
                           <label htmlFor="city">Ciudad</label>
                           <Input
+                            type="select"
                             required
-                            placeholder="Ciudad"
                             id="city"
-                            type="text"
-                            value={this.state.city}
-                            onChange={e => this.setState({ city: e.target.value })}
-                          />
+                            name="select"
+                            value={this.state.cityState}
+                            onChange={e => {
+                              const [city, state] = e.target.value.split("##");
+                              this.setState({ city, state, cityState: e.target.value });
+                            }}
+                          >
+                            <option></option>
+                            {cities.map(c => {
+                              return c.cities.map(s => {
+                                return (
+                                  <option key={shortid.generate()} value={`${s}##${c.state}`} style={{ color: "black" }}>
+                                    {`${c.state} - ${s}`}
+                                  </option>
+                                );
+                              });
+                            })}
+                          </Input>
                         </FormGroup>
                       </Col>
                     </Row>
@@ -199,4 +227,4 @@ class UserProfile extends React.Component {
   }
 }
 
-export default UserProfile;
+export default AddPlace;

@@ -1,10 +1,12 @@
 import React from "react";
 import { Button, Card, CardHeader, CardBody, CardFooter, CardTitle, Table, FormGroup, Input, Row, Col, Form } from "reactstrap";
 import API from "../API";
+import Cities from "../API/Cities";
+import shortid from "shortid";
 
 const { hostname, protocol } = window.location;
 const APIURL = `${protocol}//${hostname}:5000/api`;
-class UserProfile extends React.Component {
+class AddCandidate extends React.Component {
   constructor(props) {
     super(props);
 
@@ -19,22 +21,22 @@ class UserProfile extends React.Component {
             name: ""
           },
           resume: "",
-          charge: {
-            _id: "",
-            name: ""
-          },
-          createdAt: "2019-11-23T20:19:00.719Z",
-          updatedAt: "2019-11-23T20:23:31.977Z"
+          charge: "",
+          location: "",
+          createdAt: "",
+          updatedAt: ""
         }
       ],
       isEditing: false,
       isReady: true,
+      isData: false,
       id: "",
       name: "",
       identification: "",
       party: "",
       resume: "",
       charge: "",
+      location: "",
       photo: "",
       plan: "",
       parties: [
@@ -45,8 +47,10 @@ class UserProfile extends React.Component {
       ],
       charges: [
         {
-          _id: "",
-          name: ""
+          name: "ALCALDE"
+        },
+        {
+          name: "GOBERNADOR"
         }
       ]
     };
@@ -55,21 +59,20 @@ class UserProfile extends React.Component {
   async componentDidMount() {
     const r = await API.candidate.get();
     const rp = await API.party.get();
-    const rc = await API.charge.get();
-    this.setState({ candidates: r.data, parties: rp.data, charges: rc.data });
+    this.setState({ candidates: r.data, parties: rp.data, isData: true });
   }
 
   onClick = async () => {
-    const { name, isEditing, id, identification, charge, party, photo, plan, resume } = this.state;
+    const { name, isEditing, id, identification, charge, party, photo, plan, resume, location } = this.state;
     try {
       if (isEditing) {
-        await API.candidate.patch(id, name, identification, charge, party, photo, plan, resume);
+        await API.candidate.patch(id, name, identification, charge, party, photo, plan, resume, location);
       } else {
-        await API.candidate.post(name, identification, charge, party, photo, plan, resume);
+        await API.candidate.post(name, identification, charge, party, photo, plan, resume, location);
       }
       window.location.reload();
     } catch (error) {
-      alert("Error, por favor recargue la página o verifique los datos. No se puede repetir la cédula o aplicar al mismo cargo con un partido que ya aplicó");
+      alert(error.message);
     }
   };
 
@@ -113,6 +116,7 @@ class UserProfile extends React.Component {
                         <th>Nombre</th>
                         <th>Cédula</th>
                         <th>Cargo</th>
+                        <th>Ubicación</th>
                         <th>Partido</th>
                         <th>Foto</th>
                         <th>Plan</th>
@@ -122,69 +126,72 @@ class UserProfile extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {this.state.candidates.map((c, i) => {
-                        return (
-                          <tr key={i}>
-                            <td>{c.name}</td>
-                            <td>{c.identification}</td>
-                            <td>{c.charge.name}</td>
-                            <td>{c.party.name}</td>
-                            <td>
-                              <a href={`${APIURL}/photo/${c._id}.png`} target="_blank" rel="noopener noreferrer">
-                                Click aquí
-                              </a>
-                            </td>
-                            <td>
-                              <a href={`${APIURL}/plan/${c._id}.pdf`} target="_blank" rel="noopener noreferrer">
-                                Click aquí
-                              </a>
-                            </td>
-                            <td>{new Date(c.createdAt).toLocaleString()}</td>
-                            <td>{new Date(c.updatedAt).toLocaleString()}</td>
-                            <td>
-                              <Button
-                                className="btn-round"
-                                size="sm"
-                                color="info"
-                                onClick={() => {
-                                  this.setState({
-                                    isEditing: true,
-                                    id: c._id,
-                                    name: c.name,
-                                    identification: c.identification,
-                                    charge: c.charge._id,
-                                    party: c.party._id,
-                                    photo: c.photo,
-                                    plan: c.plan,
-                                    resume: c.resume
-                                  });
-                                }}
-                              >
-                                Editar
-                              </Button>
-                              <Button
-                                className="btn-round"
-                                size="sm"
-                                color="danger"
-                                onClick={async () => {
-                                  try {
-                                    // eslint-disable-next-line no-restricted-globals
-                                    const isDelete = confirm(`¿Seguro que quierer borrar el candidato de ${c.name} con id ${c._id}?`);
-                                    if (isDelete) {
-                                      await API.candidate.delete(c._id);
-                                      window.location.reload();
+                      {this.state.isData &&
+                        this.state.candidates.map(c => {
+                          return (
+                            <tr key={shortid.generate()}>
+                              <td>{c.name}</td>
+                              <td>{c.identification}</td>
+                              <td>{c.charge}</td>
+                              <td>{c.location}</td>
+                              <td>{c.party.name}</td>
+                              <td>
+                                <a href={`${APIURL}/photo/${c._id}.png`} target="_blank" rel="noopener noreferrer">
+                                  Click aquí
+                                </a>
+                              </td>
+                              <td>
+                                <a href={`${APIURL}/plan/${c._id}.pdf`} target="_blank" rel="noopener noreferrer">
+                                  Click aquí
+                                </a>
+                              </td>
+                              <td>{new Date(c.createdAt).toLocaleString()}</td>
+                              <td>{new Date(c.updatedAt).toLocaleString()}</td>
+                              <td style={{ justifyContent: "space-around", display: "flex" }}>
+                                <Button
+                                  className="btn-round"
+                                  size="sm"
+                                  color="info"
+                                  onClick={() => {
+                                    this.setState({
+                                      isEditing: true,
+                                      id: c._id,
+                                      name: c.name,
+                                      identification: c.identification,
+                                      charge: c.charge,
+                                      location: c.location,
+                                      party: c.party._id,
+                                      photo: c.photo,
+                                      plan: c.plan,
+                                      resume: c.resume
+                                    });
+                                  }}
+                                >
+                                  Editar
+                                </Button>
+                                <Button
+                                  className="btn-round"
+                                  size="sm"
+                                  color="danger"
+                                  onClick={async () => {
+                                    try {
+                                      // eslint-disable-next-line no-restricted-globals
+                                      const isDelete = confirm(`¿Seguro que quierer borrar el candidato de ${c.name} con id ${c._id}?`);
+                                      if (isDelete) {
+                                        await API.candidate.delete(c._id);
+                                        window.location.reload();
+                                      }
+                                    } catch (error) {
+                                      alert(error);
                                     }
-                                  } catch (error) {
-                                    alert(error);
-                                  }
-                                }}
-                              >
-                                Eliminar
-                              </Button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                  }}
+                                >
+                                  Eliminar
+                                </Button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </Table>
                 </CardBody>
@@ -244,9 +251,9 @@ class UserProfile extends React.Component {
                             }}
                           >
                             <option></option>
-                            {this.state.charges.map((c, i) => {
+                            {this.state.charges.map(c => {
                               return (
-                                <option key={i} value={c._id} style={{ color: "black" }}>
+                                <option key={shortid.generate()} value={c._id} style={{ color: "black" }}>
                                   {c.name}
                                 </option>
                               );
@@ -268,9 +275,9 @@ class UserProfile extends React.Component {
                             }}
                           >
                             <option></option>
-                            {this.state.parties.map((c, i) => {
+                            {this.state.parties.map(c => {
                               return (
-                                <option key={i} value={c._id} style={{ color: "black" }}>
+                                <option key={shortid.generate()} value={c._id} style={{ color: "black" }}>
                                   {c.name}
                                 </option>
                               );
@@ -280,21 +287,58 @@ class UserProfile extends React.Component {
                       </Col>
                     </Row>
                     <Row>
-                      <Col md="12">
+                      <Col md="6">
                         <FormGroup>
                           <label htmlFor="resume">Resume</label>
-                          <Input type="textarea" id="resume" value={this.state.resume} onChange={e => this.setState({ resume: e.target.value })} />
+                          <Input
+                            style={{ maxHeight: "unset", height: "300px" }}
+                            type="textarea"
+                            id="resume"
+                            value={this.state.resume}
+                            onChange={e => this.setState({ resume: e.target.value })}
+                          />
                         </FormGroup>
                       </Col>
-                    </Row>
-                    <Row>
                       <Col md="6">
+                        <FormGroup>
+                          <label htmlFor="photo">Ubicación</label>
+                          <Input
+                            type="select"
+                            required
+                            id="city"
+                            name="select"
+                            value={this.state.location}
+                            onChange={e => {
+                              this.setState({ location: e.target.value });
+                            }}
+                          >
+                            <option></option>
+                            {this.state.charge === "ALCALDE" &&
+                              Cities.map(c => {
+                                return c.cities.map(s => {
+                                  return (
+                                    <option key={shortid.generate()} value={s} style={{ color: "black" }}>
+                                      {`${s} - ${c.state}`}
+                                    </option>
+                                  );
+                                });
+                              })}
+                            {this.state.charge === "GOBERNADOR" &&
+                              Cities.map(c => {
+                                return (
+                                  <option key={shortid.generate()} value={c.state} style={{ color: "black" }}>
+                                    {c.state}
+                                  </option>
+                                );
+                              })}
+                          </Input>
+                        </FormGroup>
                         <FormGroup>
                           <label htmlFor="photo">Foto</label>
                           <input
                             type="file"
                             id="photo"
-                            required
+                            required={!this.state.isEditing}
                             accept="image/*"
                             style={{ opacity: 1, position: "relative" }}
                             onChange={async e => {
@@ -304,14 +348,12 @@ class UserProfile extends React.Component {
                             }}
                           />
                         </FormGroup>
-                      </Col>
-                      <Col md="6">
                         <FormGroup>
                           <label htmlFor="plan">Plan</label>
                           <input
                             type="file"
                             id="plan"
-                            required
+                            required={!this.state.isEditing}
                             accept="application/pdf"
                             style={{ opacity: 1, position: "relative" }}
                             onChange={async e => {
@@ -339,4 +381,4 @@ class UserProfile extends React.Component {
   }
 }
 
-export default UserProfile;
+export default AddCandidate;

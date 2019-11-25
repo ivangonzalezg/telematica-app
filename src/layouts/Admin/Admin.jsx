@@ -1,15 +1,11 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-// javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
-
-// core components
 import AdminNavbar from "components/Navbars/AdminNavbar.jsx";
 import Sidebar from "components/Sidebar/Sidebar.jsx";
-
 import routes from "routes.js";
-
 import logo from "assets/img/react-logo.png";
+import shortid from "shortid";
 
 var ps;
 
@@ -63,9 +59,9 @@ class Admin extends React.Component {
 
   getRoutes = routes => {
     const type = window.localStorage.getItem("type");
-    return routes.map((prop, key) => {
+    return routes.map(prop => {
       if (prop.layout === "both" || type === prop.layout) {
-        return <Route path={prop.path} component={prop.component} key={key} />;
+        return <Route path={prop.path} component={prop.component} key={shortid.generate()} />;
       }
       return null;
     });

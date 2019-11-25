@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const { hostname, protocol } = window.location;
-const baseURL = `${protocol}//${hostname}:5000/api`;
+let baseURL = "http://votaciones-telematica.herokuapp.com/api";
+if (window.location.hostname === "localhost") baseURL = "http://localhost:5000/api";
 axios.defaults.baseURL = baseURL;
 
 const GET = "GET";
@@ -11,8 +11,8 @@ const DELETE = "DELETE";
 
 export default {
   charge: {
-    get: async () => {
-      const url = "/charge";
+    get: async query => {
+      const url = "/charge?" + (query ? query : "");
       const r = await axios({
         url,
         method: GET
@@ -48,29 +48,29 @@ export default {
     }
   },
   place: {
-    get: async () => {
-      const url = "/place";
+    get: async query => {
+      const url = "/place?" + (query ? query : "");
       const r = await axios({
         url,
         method: GET
       });
       return r.data;
     },
-    post: async (name, address, city) => {
+    post: async (name, address, city, state) => {
       const url = "/place";
       const r = await axios({
         url,
         method: POST,
-        data: { name, address, city }
+        data: { name, address, city, state }
       });
       return r.data;
     },
-    patch: async (id, name, address, city) => {
+    patch: async (id, name, address, city, state) => {
       const url = "/place";
       const r = await axios({
         url,
         method: PATCH,
-        data: { id, name, address, city }
+        data: { id, name, address, city, state }
       });
       return r.data;
     },
@@ -85,8 +85,8 @@ export default {
     }
   },
   party: {
-    get: async () => {
-      const url = "/party";
+    get: async query => {
+      const url = "/party?" + (query ? query : "");
       const r = await axios({
         url,
         method: GET
@@ -122,29 +122,29 @@ export default {
     }
   },
   candidate: {
-    get: async () => {
-      const url = "/candidate";
+    get: async query => {
+      const url = "/candidate?" + (query ? query : "");
       const r = await axios({
         url,
         method: GET
       });
       return r.data;
     },
-    post: async (name, identification, charge, party, photo, plan, resume) => {
+    post: async (name, identification, charge, party, photo, plan, resume, location) => {
       const url = "/candidate";
       const r = await axios({
         url,
         method: POST,
-        data: { name, identification, charge, party, photo, plan, resume }
+        data: { name, identification, charge, party, photo, plan, resume, location }
       });
       return r.data;
     },
-    patch: async (id, name, identification, charge, party, photo, plan, resume) => {
+    patch: async (id, name, identification, charge, party, photo, plan, resume, location) => {
       const url = "/candidate";
       const r = await axios({
         url,
         method: PATCH,
-        data: { id, name, identification, charge, party, photo, plan, resume }
+        data: { id, name, identification, charge, party, photo, plan, resume, location }
       });
       return r.data;
     },
@@ -159,29 +159,29 @@ export default {
     }
   },
   voter: {
-    get: async () => {
-      const url = "/voter";
+    get: async query => {
+      const url = "/voter?" + (query ? query : "");
       const r = await axios({
         url,
         method: GET
       });
       return r.data;
     },
-    post: async (name, identification, city, place) => {
+    post: async (name, identification, city, place, state) => {
       const url = "/voter";
       const r = await axios({
         url,
         method: POST,
-        data: { name, identification, city, place }
+        data: { name, identification, city, place, state }
       });
       return r.data;
     },
-    patch: async (id, name, identification, city, place) => {
+    patch: async (id, name, identification, city, place, state) => {
       const url = "/voter";
       const r = await axios({
         url,
         method: PATCH,
-        data: { id, name, identification, city, place }
+        data: { id, name, identification, city, place, state }
       });
       return r.data;
     },
@@ -194,5 +194,32 @@ export default {
       });
       return r.data;
     }
-  }
+  },
+  vote: {
+    get: async query => {
+      const url = "/vote?" + (query ? query : "");
+      const r = await axios({
+        url,
+        method: GET
+      });
+      return r.data;
+    },
+    post: async (voter, candidate, charge, location, place) => {
+      const url = "/vote";
+      const r = await axios({
+        url,
+        method: POST,
+        data: { voter, candidate, charge, location, place }
+      });
+      return r.data;
+    }
+  },
+  getParams: data => {
+    return Object.keys(data)
+      .map(k => {
+        return `${k}=${data[k]}`;
+      })
+      .join("&");
+  },
+  baseURL
 };

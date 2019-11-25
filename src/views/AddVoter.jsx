@@ -1,8 +1,10 @@
 import React from "react";
 import { Button, Card, CardHeader, CardBody, CardFooter, CardTitle, Table, FormGroup, Input, Row, Col, Form } from "reactstrap";
 import API from "../API";
+import Cities from "../API/Cities";
+import shortid from "shortid";
 
-class UserProfile extends React.Component {
+class AddVoter extends React.Component {
   constructor(props) {
     super(props);
 
@@ -13,6 +15,7 @@ class UserProfile extends React.Component {
           name: "",
           identification: "",
           city: "",
+          state: "",
           place: {
             _id: "",
             name: "",
@@ -24,10 +27,13 @@ class UserProfile extends React.Component {
         }
       ],
       isEditing: false,
+      isData: false,
       name: "",
       id: "",
       identification: "",
       city: "",
+      state: "",
+      cityState: "",
       place: "",
       places: []
     };
@@ -35,17 +41,16 @@ class UserProfile extends React.Component {
 
   async componentDidMount() {
     const r = await API.voter.get();
-    const rp = await API.place.get();
-    this.setState({ voters: r.data, places: rp.data });
+    this.setState({ voters: r.data, isData: true });
   }
 
   onClick = async () => {
-    const { name, isEditing, id, identification, city, place } = this.state;
+    const { name, isEditing, id, identification, city, place, state } = this.state;
     try {
       if (isEditing) {
-        await API.voter.patch(id, name, identification, city, place);
+        await API.voter.patch(id, name, identification, city, place, state);
       } else {
-        await API.voter.post(name, identification, city, place);
+        await API.voter.post(name, identification, city, place, state);
       }
       window.location.reload();
     } catch (error) {
@@ -84,7 +89,6 @@ class UserProfile extends React.Component {
                       <tr>
                         <th>Nombre</th>
                         <th>Cédula</th>
-                        <th>Ciudad</th>
                         <th>Lugar de votación</th>
                         <th>Creado</th>
                         <th>Actualizado</th>
@@ -92,56 +96,62 @@ class UserProfile extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {this.state.voters.map((c, i) => {
-                        return (
-                          <tr key={i}>
-                            <td>{c.name}</td>
-                            <td>{c.identification}</td>
-                            <td>{c.city}</td>
-                            <td>{`${c.place.name} - ${c.place.address}`}</td>
-                            <td>{new Date(c.createdAt).toLocaleString()}</td>
-                            <td>{new Date(c.updatedAt).toLocaleString()}</td>
-                            <td>
-                              <Button
-                                className="btn-round"
-                                size="sm"
-                                color="info"
-                                onClick={() => {
-                                  this.setState({
-                                    isEditing: true,
-                                    id: c._id,
-                                    name: c.name,
-                                    identification: c.identification,
-                                    city: c.city,
-                                    place: c.place._id
-                                  });
-                                }}
-                              >
-                                Editar
-                              </Button>
-                              <Button
-                                className="btn-round"
-                                size="sm"
-                                color="danger"
-                                onClick={async () => {
-                                  try {
-                                    // eslint-disable-next-line no-restricted-globals
-                                    const isDelete = confirm(`¿Seguro que quierer borrar el votante ${c.name}?`);
-                                    if (isDelete) {
-                                      await API.voter.delete(c._id);
-                                      window.location.reload();
+                      {this.state.isData &&
+                        this.state.voters.map(c => {
+                          return (
+                            <tr key={shortid.generate()}>
+                              <td>{c.name}</td>
+                              <td>{c.identification}</td>
+                              <td>{`${c.place.name} - ${c.place.address} - ${c.place.city}`}</td>
+                              <td>{new Date(c.createdAt).toLocaleString()}</td>
+                              <td>{new Date(c.updatedAt).toLocaleString()}</td>
+                              <td style={{ justifyContent: "space-around", display: "flex" }}>
+                                <Button
+                                  className="btn-round"
+                                  size="sm"
+                                  color="info"
+                                  onClick={() => {
+                                    this.setState({
+                                      isEditing: true,
+                                      id: c._id,
+                                      name: c.name,
+                                      identification: c.identification,
+                                      city: c.city,
+                                      state: c.state,
+                                      place: c.place._id,
+                                      cityState: `${c.city}##${c.state}`
+                                    });
+                                    const params = API.getParams({ city: c.city });
+                                    API.place.get(params).then(r => {
+                                      this.setState({ places: r.data });
+                                    });
+                                  }}
+                                >
+                                  Editar
+                                </Button>
+                                <Button
+                                  className="btn-round"
+                                  size="sm"
+                                  color="danger"
+                                  onClick={async () => {
+                                    try {
+                                      // eslint-disable-next-line no-restricted-globals
+                                      const isDelete = confirm(`¿Seguro que quierer borrar el votante ${c.name}?`);
+                                      if (isDelete) {
+                                        await API.voter.delete(c._id);
+                                        window.location.reload();
+                                      }
+                                    } catch (error) {
+                                      alert(error);
                                     }
-                                  } catch (error) {
-                                    alert(error);
-                                  }
-                                }}
-                              >
-                                Eliminar
-                              </Button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                  }}
+                                >
+                                  Eliminar
+                                </Button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </Table>
                 </CardBody>
@@ -188,17 +198,33 @@ class UserProfile extends React.Component {
                     </Row>
                     <Row>
                       <Col md="6">
-                        <FormGroup>
-                          <label htmlFor="city">Ciudad</label>
-                          <Input
-                            required
-                            placeholder="Nombre"
-                            id="city"
-                            type="text"
-                            value={this.state.city}
-                            onChange={e => this.setState({ city: e.target.value })}
-                          />
-                        </FormGroup>
+                        <label htmlFor="city">Ciudad</label>
+                        <Input
+                          type="select"
+                          required
+                          id="city"
+                          name="select"
+                          value={this.state.cityState}
+                          onChange={e => {
+                            const [city, state] = e.target.value.split("##");
+                            this.setState({ city, state, cityState: e.target.value });
+                            const params = API.getParams({ city });
+                            API.place.get(params).then(r => {
+                              this.setState({ places: r.data });
+                            });
+                          }}
+                        >
+                          <option></option>
+                          {Cities.map(c => {
+                            return c.cities.map(s => {
+                              return (
+                                <option key={shortid.generate()} value={`${s}##${c.state}`} style={{ color: "black" }}>
+                                  {`${c.state} - ${s}`}
+                                </option>
+                              );
+                            });
+                          })}
+                        </Input>
                       </Col>
                       <Col md="6">
                         <FormGroup>
@@ -206,6 +232,7 @@ class UserProfile extends React.Component {
                           <Input
                             type="select"
                             required
+                            disabled={this.state.city === ""}
                             id="place"
                             name="select"
                             value={this.state.place}
@@ -214,10 +241,10 @@ class UserProfile extends React.Component {
                             }}
                           >
                             <option></option>
-                            {this.state.places.map((c, i) => {
+                            {this.state.places.map(c => {
                               return (
-                                <option key={i} value={c._id} style={{ color: "black" }}>
-                                  {c.name}
+                                <option key={shortid.generate()} value={c._id} style={{ color: "black" }}>
+                                  {`${c.name} - ${c.city}`}
                                 </option>
                               );
                             })}
@@ -241,4 +268,4 @@ class UserProfile extends React.Component {
   }
 }
 
-export default UserProfile;
+export default AddVoter;
