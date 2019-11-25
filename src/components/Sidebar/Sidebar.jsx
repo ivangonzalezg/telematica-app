@@ -15,7 +15,7 @@ class Sidebar extends React.Component {
   }
 
   activeRoute(routeName) {
-    return this.props.location.pathname === routeName ? "active" : "";
+    return window.location.pathname === routeName ? "active" : "";
   }
 
   componentDidMount() {

@@ -9,7 +9,7 @@ import ChoosePlace from "views/ChoosePlace";
 
 var routes = [
   {
-    path: "/results",
+    path: "/home",
     name: "Resultados",
     icon: "tim-icons icon-chart-pie-36",
     component: Dashboard,
