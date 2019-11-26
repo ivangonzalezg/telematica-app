@@ -70,6 +70,7 @@ class Vote extends React.Component {
   async componentDidMount() {
     const r = await API.place.get();
     const place = localStorage.getItem("place");
+    if (!place) window.location.pathname = "/choose-location";
     this.setState({ places: r.data, isPlaces: true, place });
   }
 
@@ -90,8 +91,8 @@ class Vote extends React.Component {
   sendVote = async () => {
     const { mayor, governor, voter, place } = this.state;
     try {
-      await API.vote.post(voter._id, governor._id, "GOBERNADOR", voter.state, place);
-      await API.vote.post(voter._id, mayor._id, "ALCALDE", voter.city, place);
+      if (governor._id) await API.vote.post(voter._id, governor._id, "GOBERNADOR", voter.state, place);
+      if (mayor._id) await API.vote.post(voter._id, mayor._id, "ALCALDE", voter.city, place);
       alert("!Gracias por votar!");
       window.location.reload();
     } catch (e) {
@@ -248,12 +249,12 @@ class Vote extends React.Component {
                   return (
                     <Row key={shortid.generate()} className="governor">
                       <Col md="3">
-                        <img src={`${API.baseURL}/photo/${g._id}.png`} alt={g.name} />
+                        <img src={`${API.baseURL}/photo/${g._id}`} alt={g.name} />
                       </Col>
                       <Col md="9">
                         <h3 style={{ marginBottom: 0 }}>{g.name}</h3>
                         <h5 style={{ marginBottom: 0 }}>{g.party.name}</h5>
-                        <a href={`${API.baseURL}/plan/${g._id}.pdf`} target="_blank" rel="noopener noreferrer">
+                        <a href={`${API.baseURL}/plan/${g._id}`} target="_blank" rel="noopener noreferrer">
                           Ver plan de gobierno
                         </a>
                         <br />
@@ -298,34 +299,34 @@ class Vote extends React.Component {
   };
 
   ChangeGovernor = () => {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between"
-        }}
-      >
-        <h4 style={{ display: "inline" }}>
-          {this.state.governor.name ? (
+    if (this.state.governor.name) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between"
+          }}
+        >
+          <h4 style={{ display: "inline" }}>
             <span>
               Para Gobernador: <b>{this.state.governor.name}</b>
             </span>
-          ) : (
-            <span>Gobernador no seleccionado</span>
-          )}
-        </h4>
-        <Button
-          className="btn-round"
-          size="sm"
-          color="success"
-          onClick={() => {
-            this.setState({ step: 1 });
-          }}
-        >
-          Cambiar
-        </Button>
-      </div>
-    );
+          </h4>
+          <Button
+            className="btn-round"
+            size="sm"
+            color="success"
+            onClick={() => {
+              this.setState({ step: 1 });
+            }}
+          >
+            Cambiar
+          </Button>
+        </div>
+      );
+    } else {
+      return null;
+    }
   };
 
   ChooseMayor = () => {
@@ -350,12 +351,12 @@ class Vote extends React.Component {
                   return (
                     <Row key={shortid.generate()} className="governor">
                       <Col md="3">
-                        <img src={`${API.baseURL}/photo/${m._id}.png`} alt={m.name} />
+                        <img src={`${API.baseURL}/photo/${m._id}`} alt={m.name} />
                       </Col>
                       <Col md="9">
                         <h3 style={{ marginBottom: 0 }}>{m.name}</h3>
                         <h5 style={{ marginBottom: 0 }}>{m.party.name}</h5>
-                        <a href={`${API.baseURL}/plan/${m._id}.pdf`} target="_blank" rel="noopener noreferrer">
+                        <a href={`${API.baseURL}/plan/${m._id}`} target="_blank" rel="noopener noreferrer">
                           Ver plan de gobierno
                         </a>
                         <br />
@@ -399,34 +400,34 @@ class Vote extends React.Component {
   };
 
   ChangeMayor = () => {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between"
-        }}
-      >
-        <h4 style={{ display: "inline" }}>
-          {this.state.mayor.name ? (
+    if (this.state.mayor.name) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between"
+          }}
+        >
+          <h4 style={{ display: "inline" }}>
             <span>
               Para Alcalde: <b>{this.state.mayor.name}</b>
             </span>
-          ) : (
-            <span>Alcalde no seleccionado</span>
-          )}
-        </h4>
-        <Button
-          className="btn-round"
-          size="sm"
-          color="success"
-          onClick={() => {
-            this.setState({ step: 2 });
-          }}
-        >
-          Cambiar
-        </Button>
-      </div>
-    );
+          </h4>
+          <Button
+            className="btn-round"
+            size="sm"
+            color="success"
+            onClick={() => {
+              this.setState({ step: 2 });
+            }}
+          >
+            Cambiar
+          </Button>
+        </div>
+      );
+    } else {
+      return null;
+    }
   };
 
   ConfirmateVote = () => {
@@ -436,37 +437,56 @@ class Vote extends React.Component {
         {this.ReinsertIdentification()}
         {this.ChangeGovernor()}
         {this.ChangeMayor()}
-        <Row>
-          <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
-            <h4>
-              Señor {this.state.voter.name} C.C {this.state.voter.identification}
-            </h4>
-          </Col>
-          <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
-            <h4>Va a votar por Gobernación por: {this.state.governor.name}</h4>
-          </Col>
-          <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
-            <h4>Y Alcaldía por: {this.state.mayor.name}</h4>
-          </Col>
-          <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
-            <h4>¿Está seguro?</h4>
-          </Col>
-          <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
-            <Button className="btn-round" size="sm" color="info" onClick={this.sendVote}>
-              SI
-            </Button>
+        {this.state.mayor.name !== "" || this.state.governor.name !== "" ? (
+          <Row>
+            <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
+              <h4>
+                Señor {this.state.voter.name} C.C {this.state.voter.identification}
+              </h4>
+            </Col>
+            {this.state.governor.name !== "" && (
+              <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
+                <h4>Va a votar por Gobernación por: {this.state.governor.name}</h4>
+              </Col>
+            )}
+            {this.state.mayor.name !== "" && (
+              <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
+                <h4>Y Alcaldía por: {this.state.mayor.name}</h4>
+              </Col>
+            )}
+            <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
+              <h4>¿Está seguro?</h4>
+            </Col>
+            <Col md="12" style={{ justifyContent: "center", display: "flex" }}>
+              <Button className="btn-round" size="sm" color="info" onClick={this.sendVote}>
+                SI
+              </Button>
+              <Button
+                className="btn-round"
+                size="sm"
+                color="warning"
+                onClick={() => {
+                  window.location.reload();
+                }}
+              >
+                NO
+              </Button>
+            </Col>
+          </Row>
+        ) : (
+          <div style={{ textAlign: "center" }}>
+            <h4>Intente nuevamente</h4>
             <Button
-              className="btn-round"
-              size="sm"
-              color="warning"
+              className="btn-fill"
+              color="primary"
               onClick={() => {
                 window.location.reload();
               }}
             >
-              NO
+              Recargar
             </Button>
-          </Col>
-        </Row>
+          </div>
+        )}
       </div>
     );
   };

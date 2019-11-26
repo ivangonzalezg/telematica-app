@@ -4,8 +4,6 @@ import API from "../API";
 import Cities from "../API/Cities";
 import shortid from "shortid";
 
-const { hostname, protocol } = window.location;
-const APIURL = `${protocol}//${hostname}:5000/api`;
 class AddCandidate extends React.Component {
   constructor(props) {
     super(props);
@@ -136,12 +134,12 @@ class AddCandidate extends React.Component {
                               <td>{c.location}</td>
                               <td>{c.party.name}</td>
                               <td>
-                                <a href={`${APIURL}/photo/${c._id}.png`} target="_blank" rel="noopener noreferrer">
+                                <a href={`${API.baseURL}/photo/${c._id}`} target="_blank" rel="noopener noreferrer">
                                   Click aquí
                                 </a>
                               </td>
                               <td>
-                                <a href={`${APIURL}/plan/${c._id}.pdf`} target="_blank" rel="noopener noreferrer">
+                                <a href={`${API.baseURL}/plan/${c._id}`} target="_blank" rel="noopener noreferrer">
                                   Click aquí
                                 </a>
                               </td>
