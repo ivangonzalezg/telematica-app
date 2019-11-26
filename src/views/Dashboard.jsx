@@ -54,11 +54,11 @@ class Dashboard extends React.Component {
     const paramsg = API.getParams({ charge: "GOBERNADOR" });
     const rg = await API.vote.get(paramsg);
     let governors = rg.data.sort((a, b) => b.votes - a.votes);
-    governors = governors.filter((thing, index, self) => index === self.findIndex(t => t.location === t.location));
+    governors = governors.filter((thing, index, self) => index === self.findIndex(t => t.location === thing.location));
     const paramsa = API.getParams({ charge: "ALCALDE" });
     const ra = await API.vote.get(paramsa);
     let mayors = ra.data.sort((a, b) => b.votes - a.votes);
-    mayors = mayors.filter((thing, index, self) => index === self.findIndex(t => t.location === t.location));
+    mayors = mayors.filter((thing, index, self) => index === self.findIndex(t => t.location === thing.location));
     this.setState({ governors, isGovernors: true, mayors, isMayors: true });
   }
 
