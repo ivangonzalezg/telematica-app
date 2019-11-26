@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let baseURL = "http://votaciones-telematica.herokuapp.com/api";
+let baseURL = "https://votaciones-telematica.herokuapp.com/api";
 if (window.location.hostname === "localhost") baseURL = "http://localhost:5000/api";
 axios.defaults.baseURL = baseURL;
 
