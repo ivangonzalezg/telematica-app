@@ -7,6 +7,9 @@ jobs:
       name: node/default
     steps:
       - checkout
+      - node/install:
+          install-yarn: true
+          node-version: latest
       - node/with-cache:
           steps:
             - run: npm install
